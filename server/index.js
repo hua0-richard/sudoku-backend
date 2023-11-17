@@ -28,9 +28,62 @@ function emptySudoku() {
   return sudoku; 
 }
 
+const createTableQuery = `
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    age INTEGER
+  )
+`;
+
+// Define the SQL statement to insert data into the table
+const insertDataQuery = `
+  INSERT INTO users (name, age) VALUES
+  ('John Doe', 25),
+  ('Jane Doe', 30),
+  ('Bob Smith', 22)
+`;
+
+// Execute the SQL statement to create the table
+db.run(createTableQuery, (err) => {
+  if (err) {
+    console.error('Error creating table:', err.message);
+    return;
+  }
+
+  // Execute the SQL statement to insert data into the table
+  db.run(insertDataQuery, (err) => {
+    if (err) {
+      console.error('Error inserting data:', err.message);
+    } else {
+      console.log('Data inserted successfully');
+
+      // Query the table to retrieve the inserted data
+      db.all('SELECT * FROM users', (err, rows) => {
+        if (err) {
+          console.error('Error querying data:', err.message);
+        } else {
+          console.log('Retrieved data:');
+          console.log(rows);
+        }
+
+        // // Close the database connection
+        // db.close();
+      });
+    }
+  });
+});
+
 app.get("/api", (req, res) => {
-  let temp = emptySudoku();
-  res.json({result: temp});
+  db.all('SELECT * FROM users', (err, rows) => {
+    if (err) {
+      console.error('Error querying data:', err.message);
+    } else {
+      console.log('Retrieved data:');
+      console.log(rows);
+      res.json({result: rows});
+    }
+});
 });
 
 app.listen(PORT, () => {
