@@ -28,14 +28,6 @@ function emptySudoku() {
   return sudoku;
 }
 
-const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    age INTEGER
-  )
-`;
-
 app.get("/api", (req, res) => {
   db.all("SELECT * FROM users", (err, rows) => {
     if (err) {
