@@ -19,13 +19,13 @@ const app = express();
 function emptySudoku() {
   let sudoku = [];
   for (let i = 0; i < 9; i++) {
-      let row = [];
-      for (let j = 0; j < 9; j++) {
-          row.push(0);
-      }
-      sudoku.push(row);
+    let row = [];
+    for (let j = 0; j < 9; j++) {
+      row.push(0);
+    }
+    sudoku.push(row);
   }
-  return sudoku; 
+  return sudoku;
 }
 
 const createTableQuery = `
@@ -36,57 +36,18 @@ const createTableQuery = `
   )
 `;
 
-// Define the SQL statement to insert data into the table
-const insertDataQuery = `
-  INSERT INTO users (name, age) VALUES
-  ('John Doe', 25),
-  ('Jane Doe', 30),
-  ('Bob Smith', 22)
-`;
-
-// Execute the SQL statement to create the table
-db.run(createTableQuery, (err) => {
-  if (err) {
-    console.error('Error creating table:', err.message);
-    return;
-  }
-
-  // Execute the SQL statement to insert data into the table
-  db.run(insertDataQuery, (err) => {
+app.get("/api", (req, res) => {
+  db.all("SELECT * FROM users", (err, rows) => {
     if (err) {
-      console.error('Error inserting data:', err.message);
+      console.error("Error querying data:", err.message);
     } else {
-      console.log('Data inserted successfully');
-
-      // Query the table to retrieve the inserted data
-      db.all('SELECT * FROM users', (err, rows) => {
-        if (err) {
-          console.error('Error querying data:', err.message);
-        } else {
-          console.log('Retrieved data:');
-          console.log(rows);
-        }
-
-        // // Close the database connection
-        // db.close();
-      });
+      console.log("Retrieved data:");
+      console.log(rows);
+      res.json({ result: rows });
     }
   });
-});
-
-app.get("/api", (req, res) => {
-  db.all('SELECT * FROM users', (err, rows) => {
-    if (err) {
-      console.error('Error querying data:', err.message);
-    } else {
-      console.log('Retrieved data:');
-      console.log(rows);
-      res.json({result: rows});
-    }
-});
 });
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
-
