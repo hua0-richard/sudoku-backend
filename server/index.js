@@ -39,31 +39,68 @@ function isValid(sudoku, r, c, k) {
   return true;
 }
 
-function solve(sudoku, r, c, countsol=false) {
+function unique(sudoku, r, c, sol) {
   if (sudoku)
     if (r === 9) {
-      return true;
+      return sol + 1;
     } else if (c === 9) {
-      return solve(sudoku, r + 1, 0, countsol);
+      return unique(sudoku, r + 1, 0, sol);
     } else if (sudoku[r][c] !== 0) {
-      return solve(sudoku, r, c + 1, countsol);
+      return unique(sudoku, r, c + 1, sol);
+    } else {
+      for (let k = 1; k < 10; k++) {
+        if (isValid(sudoku, r, c, k) && sol < 2) {
+          sudoku[r][c] = k;
+          sol = unique(sudoku, r, c + 1, sol)
+        }
+      }
+      sudoku[r][c] = 0;
+      return sol;
+    }
+}
+
+function solve(sudoku, r, c) {
+  if (sudoku)
+    if (r === 9) {
+      return true
+    } else if (c === 9) {
+      return solve(sudoku, r + 1, 0);
+    } else if (sudoku[r][c] !== 0) {
+      return solve(sudoku, r, c + 1);
     } else {
       for (let k = 1; k < 10; k++) {
         if (isValid(sudoku, r, c, k)) {
           sudoku[r][c] = k;
-          if (solve(sudoku, r, c + 1, countsol)) {
-            if (countsol) {
-              sudoku[r][c] = 0;
-            } else {
-              return true;
-            }
+          if (solve(sudoku, r, c + 1)) {
+            return true
           }
           sudoku[r][c] = 0;
         }
       }
       return false;
     }
-}
+ }
+ 
+ function checkZeros(sudoku, limit) {
+  let count = 0;
+  for (let r of sudoku) {
+    for (let c of r) {
+      if (c === 0) {
+        count ++; 
+      }
+    }
+  }
+  if (count < limit) {
+    return false;
+  }
+  return true; 
+ }
+
+ function diff(sudoku) {
+  while (!checkZeros(sudoku, 55)) {
+    notUnique(sudoku)
+  }
+ }
 
 function check(sudoku_solution, sudoku) {
   for (let i = 0; i < 9; i++) {
@@ -76,25 +113,14 @@ function check(sudoku_solution, sudoku) {
   return true;
 }
 
-function unique(s) {
-  for (let i = 0; i < 60; i++) {
-  var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
-  var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
-  let save =  s[rA][rB]
-  let temp = [];
-  for (let row of s) {
-    let r = [];
-    for (let column of row) {
-      r.push(column)
+function notUnique(s) {
+    var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+    var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+    let temp = JSON.parse(JSON.stringify(s));
+    temp[rA][rB] = 0;  
+    if (unique(temp,0,0,0) === 1) {
+    s[rA][rB] = 0;  
     }
-    temp.push(r)
-  }
-  temp[rA][rB] = 0;
-  if (!solve(temp, 0 ,0, true)) {
-    s[rA][rB] = save;
-  }
-}
-
 }
 
 function emptySudoku() {
@@ -153,8 +179,9 @@ app.get("/api", (req, res) => {
     } else {
       let s = emptySudoku();
       fillSudoku(s)
-      unique(s)
-      // console.log(solve(s, 0, 0, true))
+      diff(s)
+      console.log(unique(s,0 ,0,0))
+      solve(s,0,0)
       res.json({ result: s });
     }
   });
