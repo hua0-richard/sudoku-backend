@@ -181,7 +181,7 @@ app.get("/api", (req, res) => {
       fillSudoku(s)
       diff(s)
       console.log(unique(s,0 ,0,0))
-      solve(s,0,0)
+      // solve(s,0,0)
       res.json({ result: s });
     }
   });
