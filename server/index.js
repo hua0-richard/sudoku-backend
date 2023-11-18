@@ -39,20 +39,24 @@ function isValid(sudoku, r, c, k) {
   return true;
 }
 
-function solve(sudoku, r, c) {
+function solve(sudoku, r, c, countsol=false) {
   if (sudoku)
     if (r === 9) {
       return true;
     } else if (c === 9) {
-      return solve(sudoku, r + 1, 0);
+      return solve(sudoku, r + 1, 0, countsol);
     } else if (sudoku[r][c] !== 0) {
-      return solve(sudoku, r, c + 1);
+      return solve(sudoku, r, c + 1, countsol);
     } else {
-      for (let k = 1; k <= 10; k++) {
+      for (let k = 1; k < 10; k++) {
         if (isValid(sudoku, r, c, k)) {
           sudoku[r][c] = k;
-          if (solve(sudoku, r, c + 1)) {
-            return true;
+          if (solve(sudoku, r, c + 1, countsol)) {
+            if (countsol) {
+              sudoku[r][c] = 0;
+            } else {
+              return true;
+            }
           }
           sudoku[r][c] = 0;
         }
@@ -72,16 +76,25 @@ function check(sudoku_solution, sudoku) {
   return true;
 }
 
-function notUnique(sudoku) {
-  for (let i = 0; i < 20; i++) {
-  var randomNumber = Math.floor(Math.random() * 81) + 1;
-  var row = Math.floor(randomNumber / 9)
-  if (row === 9) row--
-  var col = randomNumber - (row * 9)
-  if (col ===9 ) col--
-  console.log(row + " " + col)
-  sudoku[row][col] = 0; 
+function unique(s) {
+  for (let i = 0; i < 60; i++) {
+  var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+  var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+  let save =  s[rA][rB]
+  let temp = [];
+  for (let row of s) {
+    let r = [];
+    for (let column of row) {
+      r.push(column)
+    }
+    temp.push(r)
+  }
+  temp[rA][rB] = 0;
+  if (!solve(temp, 0 ,0, true)) {
+    s[rA][rB] = save;
+  }
 }
+
 }
 
 function emptySudoku() {
@@ -96,11 +109,37 @@ function emptySudoku() {
   return sudoku;
 }
 
-function generateSudoku() {
-  var sudoku = emptySudoku();
-  solve(sudoku, 0 ,0);
-  return sudoku;
+function shuffleArray(array) {
+  // Fisher-Yates (Knuth) Shuffle
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
+
+
+function fillSudoku(board) {
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      if (board[row][col] === 0) {
+        let randomNums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        for (let num of randomNums) {
+          if (isValid(board, row, col, num)) {
+            board[row][col] = num;
+            if (fillSudoku(board)) {
+              return true;
+            }
+            board[row][col] = 0; // Backtrack if the current placement is invalid
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return true; // The board is filled
+}
+
 
 const PORT = process.env.PORT || 3001;
 
@@ -112,8 +151,10 @@ app.get("/api", (req, res) => {
     if (err) {
       console.error("Error querying data:", err.message);
     } else {
-      let s = generateSudoku();
-      notUnique(s)
+      let s = emptySudoku();
+      fillSudoku(s)
+      unique(s)
+      // console.log(solve(s, 0, 0, true))
       res.json({ result: s });
     }
   });
