@@ -92,6 +92,7 @@ function checkZeros(sudoku, limit) {
     }
   }
   if (count < limit) {
+    console.log("fail")
     return false;
   }
   return true;
