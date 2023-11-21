@@ -7,8 +7,9 @@ const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
   }
   console.log("Connected to Database");
 });
-const cors = require('cors');
-
+const cors = require("cors");
+var bodyParser = require("body-parser")
+var jsonParser = bodyParser.json()
 // db.close((err) => {
 //   if (err) { console.err(err.message)}
 // })
@@ -51,7 +52,7 @@ function unique(sudoku, r, c, sol) {
       for (let k = 1; k < 10; k++) {
         if (isValid(sudoku, r, c, k) && sol < 2) {
           sudoku[r][c] = k;
-          sol = unique(sudoku, r, c + 1, sol)
+          sol = unique(sudoku, r, c + 1, sol);
         }
       }
       sudoku[r][c] = 0;
@@ -62,7 +63,7 @@ function unique(sudoku, r, c, sol) {
 function solve(sudoku, r, c) {
   if (sudoku)
     if (r === 9) {
-      return true
+      return true;
     } else if (c === 9) {
       return solve(sudoku, r + 1, 0);
     } else if (sudoku[r][c] !== 0) {
@@ -72,35 +73,35 @@ function solve(sudoku, r, c) {
         if (isValid(sudoku, r, c, k)) {
           sudoku[r][c] = k;
           if (solve(sudoku, r, c + 1)) {
-            return true
+            return true;
           }
           sudoku[r][c] = 0;
         }
       }
       return false;
     }
- }
- 
- function checkZeros(sudoku, limit) {
+}
+
+function checkZeros(sudoku, limit) {
   let count = 0;
   for (let r of sudoku) {
     for (let c of r) {
       if (c === 0) {
-        count ++; 
+        count++;
       }
     }
   }
   if (count < limit) {
     return false;
   }
-  return true; 
- }
+  return true;
+}
 
- function diff(sudoku) {
+function diff(sudoku) {
   while (!checkZeros(sudoku, 55)) {
-    notUnique(sudoku)
+    notUnique(sudoku);
   }
- }
+}
 
 function check(sudoku_solution, sudoku) {
   for (let i = 0; i < 9; i++) {
@@ -114,13 +115,13 @@ function check(sudoku_solution, sudoku) {
 }
 
 function notUnique(s) {
-    var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
-    var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
-    let temp = JSON.parse(JSON.stringify(s));
-    temp[rA][rB] = 0;  
-    if (unique(temp,0,0,0) === 1) {
-    s[rA][rB] = 0;  
-    }
+  var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+  var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+  let temp = JSON.parse(JSON.stringify(s));
+  temp[rA][rB] = 0;
+  if (unique(temp, 0, 0, 0) === 1) {
+    s[rA][rB] = 0;
+  }
 }
 
 function emptySudoku() {
@@ -144,7 +145,6 @@ function shuffleArray(array) {
   return array;
 }
 
-
 function fillSudoku(board) {
   for (let row = 0; row < 9; row++) {
     for (let col = 0; col < 9; col++) {
@@ -166,26 +166,31 @@ function fillSudoku(board) {
   return true; // The board is filled
 }
 
-
 const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(cors());
 
-app.get("/api", (req, res) => {
+app.get("/sudoku", (req, res) => {
   db.all("SELECT * FROM users", (err, rows) => {
     if (err) {
       console.error("Error querying data:", err.message);
     } else {
-      let s = emptySudoku();
-      fillSudoku(s)
-      diff(s)
-      console.log(unique(s,0 ,0,0))
-      solve(s,0,0)
-      res.json({ result: s });
+      let sudoku = emptySudoku();
+      fillSudoku(sudoku);
+      diff(sudoku);
+      console.log(unique(sudoku, 0, 0, 0));
+      // solve(sudoku, 0, 0);
+      res.json({result: sudoku});
     }
   });
 });
+
+app.post("/solution", jsonParser, (req, res) => {
+  console.log(req.body);
+  let solution = solve(req.body, 0, 0);
+  res.json({result: req.body});
+})
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
