@@ -97,9 +97,9 @@ function checkZeros(sudoku, limit) {
   return true;
 }
 
-function diff(sudoku) {
+ function diff(sudoku) {
   while (!checkZeros(sudoku, 55)) {
-    notUnique(sudoku);
+    notUnique(sudoku)
   }
 }
 
