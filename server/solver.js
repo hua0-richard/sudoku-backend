@@ -1,4 +1,4 @@
-import * as util from "./util.js"
+import * as util from "../tools/util.js"
 
 export function isValid(sudoku, r, c, k) {
   for (let i = 0; i < 9; i++) {
