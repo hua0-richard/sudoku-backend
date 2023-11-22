@@ -6,6 +6,19 @@ export function shuffleArray(array) {
     return array;
   }
 
+export function list() {
+    let list = [];
+    for (let i = 0; i < 81; i++) {
+        let row = Math.floor(i / 9);
+        let column = i % 9; 
+        list.push({
+            row: row,
+            column: column
+        });
+    }
+    return list; 
+}
+
 function random(a, b) {
     return 0;
 }

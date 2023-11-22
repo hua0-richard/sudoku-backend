@@ -102,6 +102,7 @@ export function check(sudoku_solution, sudoku) {
 }
 
 export function notUnique(s) {
+  let holes = [];
   var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
   var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
   let temp = JSON.parse(JSON.stringify(s));
