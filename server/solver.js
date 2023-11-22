@@ -1,3 +1,5 @@
+import * as util from "./util.js"
+
 export function isValid(sudoku, r, c, k) {
   for (let i = 0; i < 9; i++) {
     if (sudoku[r][i] === k) {
@@ -122,7 +124,6 @@ export function emptySudoku() {
 }
 
 export function shuffleArray(array) {
-  // Fisher-Yates (Knuth) Shuffle
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
@@ -134,7 +135,7 @@ export function fillSudoku(board) {
   for (let row = 0; row < 9; row++) {
     for (let col = 0; col < 9; col++) {
       if (board[row][col] === 0) {
-        let randomNums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        let randomNums = util.shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
         for (let num of randomNums) {
           if (isValid(board, row, col, num)) {
             board[row][col] = num;

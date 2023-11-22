@@ -5,6 +5,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 const jsonParser = bodyParser.json();
 import * as solver from "./solver.js";
+
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     return console.error(err.message);
