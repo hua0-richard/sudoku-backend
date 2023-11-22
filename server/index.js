@@ -29,9 +29,7 @@ app.get("/sudoku", (req, res) => {
     } else {
       let sudoku = solver.emptySudoku();
       solver.fillSudoku(sudoku);
-      solver.diff(sudoku);
-      console.log(solver.unique(sudoku, 0, 0, 0));
-      // solve(sudoku, 0, 0);
+      sudoku = solver.holes(sudoku);
       res.json({ result: sudoku });
     }
   });

@@ -84,12 +84,6 @@ export function checkZeros(sudoku, limit) {
   return true;
 }
 
-export function diff(sudoku) {
-  while (!checkZeros(sudoku, 55)) {
-    notUnique(sudoku);
-  }
-}
-
 export function check(sudoku_solution, sudoku) {
   for (let i = 0; i < 9; i++) {
     for (let j = 0; j < 9; j++) {
@@ -101,15 +95,27 @@ export function check(sudoku_solution, sudoku) {
   return true;
 }
 
-export function notUnique(s) {
-  let holes = [];
-  var rA = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
-  var rB = Math.floor(Math.random() * 9); // Generates a random integer between 0 and 8
+export function holes(s) {
   let temp = JSON.parse(JSON.stringify(s));
-  temp[rA][rB] = 0;
-  if (unique(temp, 0, 0, 0) === 1) {
-    s[rA][rB] = 0;
+  while (true) {
+    temp = JSON.parse(JSON.stringify(s));
+    let holes = util.list();
+    let count = 0; 
+    holes = util.shuffleArray(holes);
+    while (true) {
+      let p = holes[count];
+      temp[p.row][p.column] = 0; 
+      if (unique(temp, 0, 0, 0) !== 1) {
+        break; 
+      }
+      count++; 
+      console.log(count);
+    }
+    if (count > 50) {
+      break;
+    }
   }
+  return temp;
 }
 
 export function emptySudoku() {
