@@ -23,10 +23,10 @@ const app = express();
 app.use(cors());
 
 app.get("/sudoku/easy", (req, res) => {
-    let sudoku = solver.emptySudoku();
-    solver.fillSudoku(sudoku);
-    sudoku = solver.holes(sudoku, 15);
-    res.json({ result: sudoku });
+  let sudoku = solver.emptySudoku();
+  solver.fillSudoku(sudoku);
+  sudoku = solver.holes(sudoku, 15);
+  res.json({ result: sudoku });
 });
 
 app.get("/sudoku/medium", (req, res) => {
@@ -42,8 +42,6 @@ app.get("/sudoku/hard", (req, res) => {
   sudoku = solver.holes(sudoku, 50);
   res.json({ result: sudoku });
 });
-
-
 
 app.post("/solution", jsonParser, (req, res) => {
   console.log(req.body);
