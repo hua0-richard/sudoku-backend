@@ -1,4 +1,4 @@
-import * as util from "../tools/util.js"
+import * as util from "../tools/util.js";
 
 export function isValid(sudoku, r, c, k) {
   for (let i = 0; i < 9; i++) {
@@ -95,23 +95,26 @@ export function check(sudoku_solution, sudoku) {
   return true;
 }
 
-export function holes(s) {
+export function holes(s, diff) {
   let temp = JSON.parse(JSON.stringify(s));
   while (true) {
     temp = JSON.parse(JSON.stringify(s));
     let holes = util.list();
-    let count = 0; 
+    let count = 0;
     holes = util.shuffleArray(holes);
     while (true) {
       let p = holes[count];
-      temp[p.row][p.column] = 0; 
+      temp[p.row][p.column] = 0;
       if (unique(temp, 0, 0, 0) !== 1) {
-        break; 
+        break;
       }
-      count++; 
+      if (count > diff) {
+        break;
+      }
+      count++;
       console.log(count);
     }
-    if (count > 50) {
+    if (count > diff) {
       break;
     }
   }

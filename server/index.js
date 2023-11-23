@@ -22,18 +22,28 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 app.use(cors());
 
-app.get("/sudoku", (req, res) => {
-  db.all("SELECT * FROM users", (err, rows) => {
-    if (err) {
-      console.error("Error querying data:", err.message);
-    } else {
-      let sudoku = solver.emptySudoku();
-      solver.fillSudoku(sudoku);
-      sudoku = solver.holes(sudoku);
-      res.json({ result: sudoku });
-    }
-  });
+app.get("/sudoku/easy", (req, res) => {
+    let sudoku = solver.emptySudoku();
+    solver.fillSudoku(sudoku);
+    sudoku = solver.holes(sudoku, 15);
+    res.json({ result: sudoku });
 });
+
+app.get("/sudoku/medium", (req, res) => {
+  let sudoku = solver.emptySudoku();
+  solver.fillSudoku(sudoku);
+  sudoku = solver.holes(sudoku, 30);
+  res.json({ result: sudoku });
+});
+
+app.get("/sudoku/hard", (req, res) => {
+  let sudoku = solver.emptySudoku();
+  solver.fillSudoku(sudoku);
+  sudoku = solver.holes(sudoku, 50);
+  res.json({ result: sudoku });
+});
+
+
 
 app.post("/solution", jsonParser, (req, res) => {
   console.log(req.body);
